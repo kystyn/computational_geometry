@@ -4,7 +4,6 @@
 #include <istream>
 #include <vector>
 #include <string>
-#include <map>
 
 /*!
  * \brief The Point struct
@@ -12,6 +11,13 @@
 struct Point
 {
     float x, y;
+
+    /*!
+     * \brief Comparator function.
+     * \param rhs Point to compare with.
+     * \return true if equal, false otherwise.
+     */
+    bool operator==( Point const &rhs );
 };
 
 /*!
@@ -20,7 +26,6 @@ struct Point
 class Segment
 {
 public:
-
     /*!
      * \brief Segment orientation.
      * \details Possible variants:
@@ -35,14 +40,17 @@ public:
         NONE
     };
 
+    static const float tolerance;
+
     Segment() {}
 
     /*!
      * \brief Segment class constructor.
      * \param p0 First end of segment.
      * \param p1 Second end of segment.
+     * \param id Segment identifier.
      */
-    Segment( Point const &p0, Point const &p1 );
+    Segment( Point const &_p0, Point const &_p1, int id );
 
     /*!
      * \brief Assignment operator.
@@ -65,26 +73,33 @@ public:
      */
     Orientation orientation() const;
 
+    /*!
+     * \brief Get id function.
+     * \return id.
+     */
+    int id() const;
+
+    /*!
+     * \brief Get P0 function.
+     * \return P0.
+     */
+    Point p0() const;
+
+    /*!
+     * \brief Get P1 function.
+     * \return P1.
+     */
+    Point p1() const;
+
 private:
     //! Ends of segment
-    Point p0, p1;
+    Point _p0, _p1;
+    //! Identifier
+    int _id;
     //! Segment orientation
     Orientation orient;
-    const float tolerance = 1e-5f;
 
     friend std::istream & operator>>( std::istream &is, Segment &seg );
-};
-
-class SegmentLoader
-{
-public:
-    /*!
-     * \brief Load segments from file function.
-     * \param fileName[IN] File name to load from.
-     * \param ok[OUT] true if ok, false otherwise.
-     * \return map: id -> segment
-     */
-    std::map<int, Segment> loadFromFile( std::string const& fileName, bool *ok=nullptr ) const;
 };
 
 /* Input operators */

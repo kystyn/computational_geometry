@@ -1,29 +1,29 @@
-#include <iostream>
-#include <fstream>
 #include "primitives.h"
 
-Segment::Segment(const Point &p0, const Point &p1)
+const float Segment::tolerance = 1e-5f;
+
+Segment::Segment(const Point &p0, const Point &p1, int id) : _id(id)
 {
     /* p0 is the leftist and the lowest end */
     if (p0.x < p1.x)
     {
-        this->p0 = p0;
-        this->p1 = p1;
+        this->_p0 = p0;
+        this->_p1 = p1;
     }
     else if (p1.x < p0.x)
     {
-        this->p0 = p1;
-        this->p1 = p0;
+        this->_p0 = p1;
+        this->_p1 = p0;
     }
     else if (p0.y < p1.y)
     {
-        this->p0 = p0;
-        this->p1 = p1;
+        this->_p0 = p0;
+        this->_p1 = p1;
     }
     else
     {
-        this->p0 = p1;
-        this->p1 = p0;
+        this->_p0 = p1;
+        this->_p1 = p0;
     }
 
     orient =
@@ -34,8 +34,8 @@ Segment::Segment(const Point &p0, const Point &p1)
 
 Segment & Segment::operator=(const Segment &seg)
 {
-    this->p0 = seg.p0;
-    this->p1 = seg.p1;
+    this->_p0 = seg._p0;
+    this->_p1 = seg._p1;
     return *this;
 }
 
@@ -44,15 +44,15 @@ bool Segment::intersect(const Segment &other, Point &intPt) const
     if (orient == Orientation::HORIZONTAL &&
         other.orient == Orientation::HORIZONTAL)
     {
-        if (p1.x >= other.p0.x)
+        if (_p1.x >= other._p0.x)
         {
             // any point on common part of collinear edges
-            intPt = p1;
+            intPt = _p1;
             return true;
         }
-        else if (other.p1.x >= p0.x)
+        else if (other._p1.x >= _p0.x)
         {
-            intPt = p0;
+            intPt = _p0;
             return true;
         }
         else
@@ -61,15 +61,15 @@ bool Segment::intersect(const Segment &other, Point &intPt) const
     else if (orient == Orientation::VERTICAL &&
              other.orient == Orientation::VERTICAL)
     {
-        if (p1.y >= other.p0.y)
+        if (_p1.y >= other._p0.y)
         {
             // any point on common part of collinear edges
-            intPt = p1;
+            intPt = _p1;
             return true;
         }
-        else if (other.p1.y >= p0.y)
+        else if (other._p1.y >= _p0.y)
         {
-            intPt = p0;
+            intPt = _p0;
             return true;
         }
         else
@@ -78,10 +78,10 @@ bool Segment::intersect(const Segment &other, Point &intPt) const
     else if (orient == Orientation::VERTICAL &&
              other.orient == Orientation::HORIZONTAL)
     {
-        if (other.p0.x <= p0.x && p0.x <= other.p1.x &&
-            p0.y <= other.p0.y && other.p0.y <= p1.y)
+        if (other._p0.x <= _p0.x && _p0.x <= other._p1.x &&
+            _p0.y <= other._p0.y && other._p0.y <= _p1.y)
         {
-            intPt = {p0.x, other.p0.y};
+            intPt = {_p0.x, other._p0.y};
             return true;
         }
         else
@@ -89,15 +89,30 @@ bool Segment::intersect(const Segment &other, Point &intPt) const
     }
     else
     {
-        if (p0.x <= other.p0.x && other.p0.x <= p1.x &&
-            other.p0.y <= p0.y && p0.y <= other.p1.y)
+        if (_p0.x <= other._p0.x && other._p0.x <= _p1.x &&
+            other._p0.y <= _p0.y && _p0.y <= other._p1.y)
         {
-            intPt = {other.p0.x, p0.y};
+            intPt = {other._p0.x, _p0.y};
             return true;
         }
         else
             return false;
     }
+}
+
+int Segment::id() const
+{
+    return _id;
+}
+
+Point Segment::p0() const
+{
+    return _p0;
+}
+
+Point Segment::p1() const
+{
+    return _p1;
 }
 
 std::istream &operator>>(std::istream &is, Point &pt)
@@ -108,47 +123,13 @@ std::istream &operator>>(std::istream &is, Point &pt)
 
 std::istream &operator>>(std::istream &is, Segment &seg)
 {
-    is >> seg.p0 >> seg.p1;
+    is >> seg._id >> seg._p0 >> seg._p1;
     return is;
 }
 
-std::map<int, Segment> SegmentLoader::loadFromFile(const std::string &fileName, bool *ok) const
+bool Point::operator==(const Point &rhs)
 {
-    std::ifstream ifs(fileName);
-
-    if (!ifs)
-    {
-        std::clog << "file " << fileName << " not found\n";
-        if (ok)
-            *ok = false;
-        return {};
-    }
-
-    std::map<int, Segment> segments;
-
-    while (ifs)
-    {
-        int id;
-        Segment seg;
-        if (!(ifs >> id))
-            break;
-
-        if (!(ifs >> seg))
-        {
-            std::clog << "wrong file format\n";
-            if (ok)
-                *ok = false;
-            return segments;
-        }
-
-        if (segments.find(id) != segments.end())
-        {
-            std::clog << "identifier " << id << " met twice\n";
-            if (ok)
-                *ok = false;
-        }
-        else
-            segments[id] = seg;
-    }
-    return segments;
+    return
+            (rhs.x - x) * (rhs.x - x) +
+            (rhs.y - y) * (rhs.y - y) < Segment::tolerance;
 }

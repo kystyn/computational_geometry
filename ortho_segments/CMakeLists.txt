@@ -5,4 +5,4 @@ project(ortho_segments LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-add_executable(${PROJECT_NAME} main.cpp primitives.cpp)
+add_executable(${PROJECT_NAME} main.cpp primitives.cpp intersector.cpp segment_loader.cpp)
