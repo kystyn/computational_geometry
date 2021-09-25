@@ -63,13 +63,12 @@ Intersector::EventMap Intersector::getSegmentByRightEnd(const std::vector<Segmen
     return segmentsByPt;
 }
 
-void Intersector::processEvent( Event const &event )
+void Intersector::calculateCurrentIntersections(
+        SegmentSet &leftSegments,
+        SegmentSet &rightSegments,
+        SegmentSet &crossSegments,
+        Event const &event )
 {
-    auto
-            leftSegments = leftSegMap.at(event),
-            rightSegments = rightSegMap.at(event),
-            crossSegments = crossSegMap.at(event);
-
     // if there are at least 2 segments that have left and right end correspondingly,
     // then event is a point where they are crossed
     if (!leftSegments.empty() && !rightSegments.empty())
@@ -81,7 +80,12 @@ void Intersector::processEvent( Event const &event )
         for (SegmentSet::iterator i = crossSegments.begin(); i != crossSegments.end(); ++i)
             for (auto j = i; j != crossSegments.end(); j++)
                 result.push_back({i->id(), j->id(), event.pt});
+}
 
+void Intersector::fillStatus(
+        SegmentSet &leftSegments, SegmentSet &crossSegments,
+        Event const &event )
+{
     // change key. erase all segments and insert required again
     status.clear();
     status = std::set<Segment, LessSegment>(LessSegment(event));
@@ -91,119 +95,137 @@ void Intersector::processEvent( Event const &event )
         status.insert(s);
     for (auto &s : leftSegments)
         status.insert(s);
+}
 
-    if (leftSegments.size() + crossSegments.size() == 0)
-//        || crossSegments.size() == rightSegments.size() - 1)
+void Intersector::processRightPoints( Event const &event )
+{
+    auto s_it = status.find(event.segment), s_it_copy = s_it;
+    auto
+            s_it_up = ++s_it,
+            s_it_low = --s_it_copy;
+
+    // if both up and low neighbour exist
+    if (s_it_up != status.end() && s_it_low != status.end())
     {
-        auto s_it = status.find(event.segment), s_it_copy = s_it;
-        auto
-                s_it_up = ++s_it,
-                s_it_low = --s_it_copy;
-
-        // if both up and low neighbour exist
-        if (s_it_up != status.end() && s_it_low != status.end())
+        // add intersection event if intersection exists
+        bool has_intersect;
+        auto intPt = s_it_up->intersect(*s_it_low, has_intersect);
+        if (has_intersect)
         {
-            // add intersection event if intersection exists
-            bool has_intersect;
-            auto intPt = s_it_up->intersect(*s_it_low, has_intersect);
-            if (has_intersect)
-            {
-                Event event = {intPt, *s_it_up, Event::Type::CROSS};
-                events.insert(event);
-                crossSegMap[event].insert(*s_it_up);
-                crossSegMap[event].insert(*s_it_low);
-            }
+            Event event = {intPt, *s_it_up, Event::Type::CROSS};
+            events.insert(event);
+            crossSegMap[event].insert(*s_it_up);
+            crossSegMap[event].insert(*s_it_low);
         }
+    }
+}
+
+void Intersector::processLeftCrossPoints(
+        SegmentSet &leftSegments, SegmentSet &crossSegments, Event const &event )
+{
+    // s'
+    auto up_left_seg_it = leftSegments.rbegin();
+    auto up_cross_seg_it = crossSegments.rbegin();
+    SegmentSet::reverse_iterator up_seg_it;
+
+    if (up_left_seg_it != leftSegments.rend())
+    {
+        if (up_cross_seg_it != crossSegments.rend())
+            up_seg_it = std::max(up_left_seg_it, up_cross_seg_it,
+                              [event]( SegmentSet::reverse_iterator lhs,
+                                                                 SegmentSet::reverse_iterator rhs )
+                              {
+                                  LessSegment ls(event);
+                                  return ls(*lhs, *rhs);
+                              });
+        else
+            up_seg_it = up_left_seg_it;
     }
     else
     {
-        // s'
-        auto up_left_seg_it = leftSegments.rbegin();
-        auto up_cross_seg_it = crossSegments.rbegin();
-        SegmentSet::reverse_iterator up_seg_it;
+        assert(up_cross_seg_it != crossSegments.rend());
+        up_seg_it = up_cross_seg_it;
+    }
 
-        if (up_left_seg_it != leftSegments.rend())
+    // find neighbour and check intersection
+    if (up_seg_it != status.rend())
+    {
+        auto up_seg_neighb_it = up_seg_it;
+        --up_seg_neighb_it;
+        if (up_seg_neighb_it != status.rend())
         {
-            if (up_cross_seg_it != crossSegments.rend())
-                up_seg_it = std::max(up_left_seg_it, up_cross_seg_it,
-                                  [event]( SegmentSet::reverse_iterator lhs,
-                                                                     SegmentSet::reverse_iterator rhs )
-                                  {
-                                      LessSegment ls(event);
-                                      return ls(*lhs, *rhs);
-                                  });
-            else
-                up_seg_it = up_left_seg_it;
-        }
-        else
-        {
-            assert(up_cross_seg_it != crossSegments.rend());
-            up_seg_it = up_cross_seg_it;
-        }
-
-        // find neighbour and check intersection
-        if (up_seg_it != status.rend())
-        {
-            auto up_seg_neighb_it = up_seg_it;
-            --up_seg_neighb_it;
-            if (up_seg_neighb_it != status.rend())
+            // add intersection event if intersection exists
+            bool has_intersect;
+            auto intPt = up_seg_it->intersect(*up_seg_neighb_it, has_intersect);
+            if (has_intersect)
             {
-                // add intersection event if intersection exists
-                bool has_intersect;
-                auto intPt = up_seg_it->intersect(*up_seg_neighb_it, has_intersect);
-                if (has_intersect)
-                {
-                    Event event = {intPt, *up_seg_it, Event::Type::CROSS};
-                    events.insert(event);
-                    crossSegMap[event].insert(*up_seg_it);
-                    crossSegMap[event].insert(*up_seg_neighb_it);
-                }
-            }
-        }
-
-        // s''
-        auto low_left_seg_it = leftSegments.begin();
-        auto low_cross_seg_it = crossSegments.begin();
-        SegmentSet::iterator low_seg_it;
-
-        if (low_left_seg_it != leftSegments.end())
-        {
-            if (low_cross_seg_it != crossSegments.end())
-                low_seg_it = std::min(low_left_seg_it, low_cross_seg_it,
-                                    [event]( SegmentSet::iterator lhs, SegmentSet::iterator rhs )
-                                    {
-                                        LessSegment ls(event);
-                                        return ls(*lhs, *rhs);
-                                    });
-            else
-                low_seg_it = low_left_seg_it;
-        }
-        else
-        {
-            assert(low_cross_seg_it != crossSegments.end());
-            low_seg_it = low_cross_seg_it;
-        }
-
-        // find neighbour and check intersection
-        if (low_seg_it != status.end())
-        {
-            auto low_seg_neighb_it = low_seg_it;
-            --low_seg_neighb_it;
-            if (low_seg_neighb_it != status.end())
-            {
-                // add intersection event if intersection exists
-                bool has_intersect;
-                auto intPt = low_seg_it->intersect(*low_seg_neighb_it, has_intersect);
-                if (has_intersect)
-                {
-                    Event event = {intPt, *low_seg_it, Event::Type::CROSS};
-                    events.insert(event);
-                    crossSegMap[event].insert(*low_seg_it);
-                    crossSegMap[event].insert(*low_seg_neighb_it);
-                }
+                Event event = {intPt, *up_seg_it, Event::Type::CROSS};
+                events.insert(event);
+                crossSegMap[event].insert(*up_seg_it);
+                crossSegMap[event].insert(*up_seg_neighb_it);
             }
         }
     }
+
+    // s''
+    auto low_left_seg_it = leftSegments.begin();
+    auto low_cross_seg_it = crossSegments.begin();
+    SegmentSet::iterator low_seg_it;
+
+    if (low_left_seg_it != leftSegments.end())
+    {
+        if (low_cross_seg_it != crossSegments.end())
+            low_seg_it = std::min(low_left_seg_it, low_cross_seg_it,
+                                [event]( SegmentSet::iterator lhs, SegmentSet::iterator rhs )
+                                {
+                                    LessSegment ls(event);
+                                    return ls(*lhs, *rhs);
+                                });
+        else
+            low_seg_it = low_left_seg_it;
+    }
+    else
+    {
+        assert(low_cross_seg_it != crossSegments.end());
+        low_seg_it = low_cross_seg_it;
+    }
+
+    // find neighbour and check intersection
+    if (low_seg_it != status.end())
+    {
+        auto low_seg_neighb_it = low_seg_it;
+        --low_seg_neighb_it;
+        if (low_seg_neighb_it != status.end())
+        {
+            // add intersection event if intersection exists
+            bool has_intersect;
+            auto intPt = low_seg_it->intersect(*low_seg_neighb_it, has_intersect);
+            if (has_intersect)
+            {
+                Event event = {intPt, *low_seg_it, Event::Type::CROSS};
+                events.insert(event);
+                crossSegMap[event].insert(*low_seg_it);
+                crossSegMap[event].insert(*low_seg_neighb_it);
+            }
+        }
+    }
+}
+
+void Intersector::processEvent( Event const &event )
+{
+    auto
+            leftSegments = leftSegMap.at(event),
+            rightSegments = rightSegMap.at(event),
+            crossSegments = crossSegMap.at(event);
+
+    calculateCurrentIntersections(leftSegments, rightSegments, crossSegments, event);
+    fillStatus(leftSegments, crossSegments, event);
+
+    if (leftSegments.size() + crossSegments.size() == 0)
+//        || crossSegments.size() == rightSegments.size() - 1)
+        processRightPoints(event);
+    else
+        processLeftCrossPoints(leftSegments, crossSegments, event);
 }
 
 LessSegment::LessSegment( Event const &event ) : event(event) {}

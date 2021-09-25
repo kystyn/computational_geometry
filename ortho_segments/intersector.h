@@ -87,6 +87,41 @@ private:
      */
     void processEvent( Event const &event );
 
+    /*!
+     * \brief Calculate intersections at current event function.
+     * \param leftSegments Segments seg: seg.p0 == event.pt.
+     * \param rightSegments Segments seg: seg.p1 == event.pt.
+     * \param crossSegments Segments seg: event.pt in seg.
+     * \param event Current event.
+     */
+    void calculateCurrentIntersections( SegmentSet &leftSegments,
+            SegmentSet &rightSegments, SegmentSet &crossSegments,
+            Event const &event );
+
+    /*!
+     * \brief Fill status function.
+     * \param leftSegments Segments seg: seg.p0 == event.pt.
+     * \param crossSegments Segments seg: event.pt in seg.
+     * \param event Current event.
+     */
+    void fillStatus( SegmentSet &leftSegments,
+                     SegmentSet &crossSegments, Event const &event );
+
+    /*!
+     * \brief Process right points function.
+     * \param event Current event.
+     */
+    void processRightPoints( Event const &event );
+
+    /*!
+     * \brief process left and intersection points function.
+     * \param leftSegments Segments seg: seg.p0 == event.pt.
+     * \param crossSegments Segments seg: event.pt in seg.
+     * \param event Current event.
+     */
+    void processLeftCrossPoints(
+            SegmentSet &leftSegments, SegmentSet &crossSegments, Event const &event );
+
     EventMap
         //! leftSegMap map: pt -> segment.p0 == pt
         leftSegMap,
