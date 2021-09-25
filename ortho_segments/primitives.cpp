@@ -149,6 +149,12 @@ std::istream &operator>>(std::istream &is, Point &pt)
     return is;
 }
 
+std::ostream & operator<<(std::ostream &os, Point const &pt)
+{
+    os << pt.x << ' ' << pt. y;
+    return os;
+}
+
 std::istream &operator>>(std::istream &is, Segment &seg)
 {
     is >> seg._id >> seg._p0 >> seg._p1;

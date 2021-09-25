@@ -1,8 +1,11 @@
 #include <fstream>
 #include <iostream>
-#include "segment_loader.h"
 
-std::vector<Segment> SegmentLoader::loadFromFile(const std::string &fileName, bool *ok) const
+#include "segment_loader.h"
+#include "primitives.h"
+#include "intersector.h"
+
+std::vector<Segment> SegmentLoader::loadFromFile(const std::string &fileName, bool *ok)
 {
     std::ifstream ifs(fileName);
 
@@ -34,4 +37,21 @@ std::vector<Segment> SegmentLoader::loadFromFile(const std::string &fileName, bo
             segments.emplace_back(seg);
     }
     return segments;
+}
+
+bool SegmentLoader::saveToFile( const std::string &fileName,
+                                const std::vector<Intersection> &intersections )
+{
+    std::ofstream ofs(fileName);
+
+    if (!ofs)
+    {
+        std::clog << "file " << fileName << " not found\n";
+        return false;
+    }
+
+    for (auto &inter: intersections)
+        ofs << inter.id1 << ' ' << inter.id2 << ' ' << inter.intPt << '\n';
+
+    return true;
 }

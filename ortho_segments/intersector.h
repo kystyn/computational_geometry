@@ -41,22 +41,23 @@ private:
     Event event;
 };
 
+/*!
+ * \brief The Intersection struct
+ */
+struct Intersection
+{
+    //! identifiers of intersected segments
+    int id1, id2;
+    //! Intersection point
+    Point intPt;
+};
+
 class Intersector
 {
 public:
     using SegmentSet = std::set<Segment, LessSegment>;
     using EventMap = std::map<Event, SegmentSet, LessEvent>;
     using EventSet = std::set<Event, LessEvent>;
-    /*!
-     * \brief The Intersection struct
-     */
-    struct Intersection
-    {
-        //! identifiers of intersected segments
-        int id1, id2;
-        //! Intersection point
-        Point intPt;
-    };
 
     /*!
      * \brief Compute intersections function.
@@ -85,7 +86,7 @@ private:
      * \param[IN] event Event.
      */
     void processEvent( Event const &event );
-private:   
+
     EventMap
         //! leftSegMap map: pt -> segment.p0 == pt
         leftSegMap,
@@ -97,7 +98,7 @@ private:
     //! Sweep line status
     SegmentSet status;
     //! Set of intersections
-    std::vector<Intersector::Intersection> result;
+    std::vector<Intersection> result;
 };
 
 #endif // INTERSECTOR_H

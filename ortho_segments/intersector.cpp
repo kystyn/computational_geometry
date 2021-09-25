@@ -3,7 +3,7 @@
 #include <set>
 #include "intersector.h"
 
-std::vector<Intersector::Intersection>
+std::vector<Intersection>
     Intersector::computeIntersections( const std::vector<Segment> &segments )
 {
     leftSegMap = getSegmentByLeftEnd(segments);     // pt -> segment.p0 == pt
@@ -248,5 +248,6 @@ bool LessSegment::operator()(const Segment &lhs, const Segment &rhs)
         return vert.p0().y < pt.y;
     if (event.type == Event::Type::RIGHT_UP)
         return pt.y < vert.p1().y;
-    // TODO event.type == Event::Type::CROSS
+    // TODO event.type == Event::Type::CROSS. CHECK!!!
+    return lhs.orientation() == Segment::Orientation::HORIZONTAL;
 }

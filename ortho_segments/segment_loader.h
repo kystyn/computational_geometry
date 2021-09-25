@@ -4,7 +4,9 @@
 #include <vector>
 #include <string>
 
-#include "primitives.h"
+struct Intersection;
+
+class Segment;
 
 class SegmentLoader
 {
@@ -15,7 +17,15 @@ public:
      * \param ok[OUT] true if ok, false otherwise.
      * \return List of segments.
      */
-    std::vector<Segment> loadFromFile( std::string const& fileName, bool *ok=nullptr ) const;
+    static std::vector<Segment> loadFromFile( std::string const& fileName, bool *ok=nullptr );
+
+    /*!
+     * \brief Save intersections to file function.
+     * \param fileName[IN] File name to save to.
+     * \param intersections[IN] intersection set.
+     * \return True if successfully written, false otherwise.
+     */
+    static bool saveToFile( std::string const &fileName, std::vector<Intersection> const &intersections );
 };
 
 #endif // SEGMENT_LOADER_H

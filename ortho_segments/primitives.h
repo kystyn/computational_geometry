@@ -130,4 +130,7 @@ private:
 std::istream & operator>>( std::istream &is, Point &pt );
 std::istream & operator>>( std::istream &is, Segment &seg );
 
+/* Output operators */
+std::ostream & operator<<( std::ostream &os, Point const &pt );
+
 #endif // PRIMITIVES_H
