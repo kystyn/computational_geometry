@@ -62,10 +62,10 @@ public:
     /*!
      * \brief Intersect segments function.
      * \param other[IN] segment to intersect.
-     * \param intPt[OUT] point of intersection.
-     * \return true if has intersection, false otherwise.
+     * \param has_intersect[OUT] true if has intersection, false otherwise.
+     * \return point of intersection.
      */
-    bool intersect( Segment const &other, Point &intPt ) const;
+    Point intersect( Segment const &other, bool &has_intersect ) const;
 
     /*!
      * \brief Get orientation function.
@@ -92,6 +92,30 @@ public:
     Point p1() const;
 
 private:
+    /*!
+     * \brief Intersect two horizontal segments function.
+     * \param other[IN] segment to intersect.
+     * \param has_intersect[OUT] true if has intersection, false otherwise.
+     * \return point of intersection.
+     */
+    Point intersect_hor_hor( Segment const &other, bool &has_intersect ) const;
+
+    /*!
+     * \brief Intersect two vertical segments function.
+     * \param other[IN] segment to intersect.
+     * \param has_intersect[OUT] true if has intersection, false otherwise.
+     * \return point of intersection.
+     */
+    Point intersect_ver_ver( Segment const &other, bool &has_intersect ) const;
+
+    /*!
+     * \brief Intersect horizontal & vertical segments function.
+     * \param other[IN] segment to intersect.
+     * \param has_intersect[OUT] true if has intersection, false otherwise.
+     * \return point of intersection.
+     */
+    Point intersect_hor_ver( Segment const &other, bool &has_intersect ) const;
+
     //! Ends of segment
     Point _p0, _p1;
     //! Identifier

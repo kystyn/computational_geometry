@@ -5,29 +5,48 @@
 #include <set>
 #include "primitives.h"
 
-class LessPoint
+struct Event
+{
+    Point pt;
+    Segment segment;
+    enum class Type
+    {
+        LEFT_LOW, // low or left point (p0)
+        RIGHT_UP, // up or right point (p1)
+        CROSS     // cross point
+    } type;
+};
+
+class LessEvent
 {
 public:
-    bool operator()( Point const &lhs, Point const &rhs )
+    bool operator()( Event const &lhs, Event const &rhs )
     {
-        if (lhs.x + Segment::tolerance < rhs.x)
+        if (lhs.pt.x + Segment::tolerance < rhs.pt.x)
             return true;
-        if (lhs.x > rhs.x + Segment::tolerance)
+        if (lhs.pt.x > rhs.pt.x + Segment::tolerance)
             return false;
-        return lhs.y < rhs.y;
+        return lhs.pt.y < rhs.pt.y;
     }
 };
 
 class LessSegment
 {
 public:
+    LessSegment() {}
+    LessSegment( Event const &event );
+
     bool operator()( Segment const &lhs, Segment const &rhs );
+private:
+    Event event;
 };
 
 class Intersector
 {
 public:
-    using EventMap = std::map<Point, std::vector<Segment>, LessPoint>;
+    using SegmentSet = std::set<Segment, LessSegment>;
+    using EventMap = std::map<Event, SegmentSet, LessEvent>;
+    using EventSet = std::set<Event, LessEvent>;
     /*!
      * \brief The Intersection struct
      */
@@ -52,25 +71,21 @@ private:
      * \param segments Segment list.
      * \return map: left point -> segment list.
      */
-    std::map<Point, std::vector<Segment>, LessPoint>
-        getSegmentByLeftEnd( std::vector<Segment> const &segments ) const;
+    EventMap getSegmentByLeftEnd( std::vector<Segment> const &segments ) const;
 
     /*!
      * \brief Get segments list by their right point.
      * \param segments Segment list.
      * \return map: right point -> segment list.
      */
-    std::map<Point, std::vector<Segment>, LessPoint>
-        getSegmentByRightEnd( std::vector<Segment> const &segments ) const;
+    EventMap getSegmentByRightEnd( std::vector<Segment> const &segments ) const;
 
     /*!
      * \brief Process sweep line event function.
-     * \param[IN] segments Segment array.
      * \param[IN] event Event.
      */
-    void processEvent( std::vector<Segment> const &segments,
-                       Point const &event );
-private:
+    void processEvent( Event const &event );
+private:   
     EventMap
         //! leftSegMap map: pt -> segment.p0 == pt
         leftSegMap,
@@ -78,9 +93,9 @@ private:
         rightSegMap,
         //! crossSegMap map: pt -> seg1 x ... x segn == pt
         crossSegMap;
-    std::set<Point> events;
+    EventSet events;
     //! Sweep line status
-    std::set<Segment, LessSegment> status;
+    SegmentSet status;
     //! Set of intersections
     std::vector<Intersector::Intersection> result;
 };
