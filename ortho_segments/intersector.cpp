@@ -6,6 +6,11 @@
 std::vector<Intersection>
     Intersector::computeIntersections( const std::vector<Segment> &segments )
 {
+    leftSegMap.clear();
+    rightSegMap.clear();
+    crossSegMap.clear();
+    result.clear();
+
     leftSegMap = getSegmentByLeftEnd(segments);     // pt -> segment.p0 == pt
     rightSegMap = getSegmentByRightEnd(segments);   // pt -> segment.p1 == pt
 
@@ -14,11 +19,6 @@ std::vector<Intersection>
         events.insert({s.p0(), s, Event::Type::LEFT_LOW});
         events.insert({s.p1(), s, Event::Type::RIGHT_UP});
     }
-
-    leftSegMap.clear();
-    rightSegMap.clear();
-    crossSegMap.clear();
-    result.clear();
 
     while (!events.empty())
     {
@@ -214,9 +214,13 @@ void Intersector::processLeftCrossPoints(
 void Intersector::processEvent( Event const &event )
 {
     auto
-            leftSegments = leftSegMap.at(event),
-            rightSegments = rightSegMap.at(event),
-            crossSegments = crossSegMap.at(event);
+            leftSegments_it = leftSegMap.find(event),
+            rightSegments_it = rightSegMap.find(event),
+            crossSegments_it = crossSegMap.find(event);
+
+    auto leftSegments = leftSegments_it != leftSegMap.end() ? leftSegments_it->second : SegmentSet();
+    auto rightSegments = rightSegments_it != rightSegMap.end() ? rightSegments_it->second : SegmentSet();
+    auto crossSegments = crossSegments_it != crossSegMap.end() ? crossSegments_it->second : SegmentSet();
 
     calculateCurrentIntersections(leftSegments, rightSegments, crossSegments, event);
     fillStatus(leftSegments, crossSegments, event);
