@@ -19,23 +19,24 @@ std::vector<Segment> SegmentLoader::loadFromFile(const std::string &fileName, bo
 
     std::vector<Segment> segments;
 
-    while (ifs)
+    while (ifs.peek() != EOF)
     {
-        int id;
         Segment seg;
-        if (!(ifs >> id))
-            break;
 
         if (!(ifs >> seg))
         {
-            std::clog << "wrong file format\n";
-            if (ok)
-                *ok = false;
-            return segments;
+            if (ifs.peek() != EOF)
+            {
+                std::clog << "wrong file format\n";
+                if (ok)
+                    *ok = false;
+                return segments;
+            }
         }
         else
             segments.emplace_back(seg);
     }
+    *ok = true;
     return segments;
 }
 

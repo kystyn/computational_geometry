@@ -122,8 +122,6 @@ private:
     int _id;
     //! Segment orientation
     Orientation orient;
-
-    friend std::istream & operator>>( std::istream &is, Segment &seg );
 };
 
 /* Input operators */

@@ -157,7 +157,10 @@ std::ostream & operator<<(std::ostream &os, Point const &pt)
 
 std::istream &operator>>(std::istream &is, Segment &seg)
 {
-    is >> seg._id >> seg._p0 >> seg._p1;
+    int id;
+    Point p0, p1;
+    is >> id >> p0 >> p1;
+    seg = Segment(p0, p1, id);
     return is;
 }
 
