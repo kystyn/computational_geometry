@@ -41,7 +41,7 @@ std::vector<Segment> SegmentLoader::loadFromFile(const std::string &fileName, bo
 }
 
 bool SegmentLoader::saveToFile( const std::string &fileName,
-                                Intersector::IntersectionSet const &intersections )
+                                IntersectionSet const &intersections )
 {
     std::ofstream ofs(fileName);
 
@@ -51,7 +51,7 @@ bool SegmentLoader::saveToFile( const std::string &fileName,
         return false;
     }
 
-    for (auto &inter: intersections)
+    for (auto &inter: intersections.get())
         ofs << inter.id1 << ' ' << inter.id2 << ' ' << inter.intPt << '\n';
 
     return true;

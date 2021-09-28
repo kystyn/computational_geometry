@@ -42,13 +42,38 @@ public:
                      Intersection const &rhs ) const;
 };
 
+/*!
+ * \brief Intersection set wrapper with unique insert.
+ */
+class IntersectionSet
+{
+public:
+    /*!
+     * \brief Insert into set function.
+     * \param inter intersection to insert.
+     */
+    void insert( Intersection const &inter );
+
+    /*!
+     * \brief Clear function.
+     */
+    void clear();
+
+    /*!
+     * \brief Get set function.
+     * \return
+     */
+    std::set<Intersection, LessIntersection> const & get() const;
+private:
+    std::set<Intersection, LessIntersection> intersection_set;
+};
+
 class Intersector
 {
 public:
     using SegmentSet = std::set<Segment, LessSegment>;
     using EventMap = std::map<Event, SegmentSet, LessEvent>;
     using EventSet = std::set<Event, LessEvent>;
-    using IntersectionSet = std::set<Intersection, LessIntersection>;
 
     /*!
      * \brief Compute intersections function.
@@ -110,12 +135,6 @@ private:
                      SegmentSet &rightSegments, Event const &event );
 
     /*!
-     * \brief Process right points function.
-     * \param event Current event.
-     */
-    void processRightPoints( Event const &event );
-
-    /*!
      * \brief process left and intersection points function.
      * \param leftSegments Segments seg: seg.p0 == event.pt.
      * \param crossSegments Segments seg: event.pt in seg.
@@ -137,7 +156,7 @@ private:
     //! Sweep line status
     SegmentSet status;
     //! Set of intersections
-    std::set<Intersection, LessIntersection> result;
+    IntersectionSet result;
 };
 
 #endif // INTERSECTOR_H

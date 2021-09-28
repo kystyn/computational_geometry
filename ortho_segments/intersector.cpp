@@ -4,8 +4,8 @@
 #include <iostream>
 #include "intersector.h"
 
-Intersector::IntersectionSet
-    Intersector::computeIntersections( const std::vector<Segment> &segments )
+IntersectionSet Intersector::computeIntersections(
+        const std::vector<Segment> &segments )
 {
     leftSegMap.clear();
     rightSegMap.clear();
@@ -50,7 +50,7 @@ Intersector::EventMap Intersector::getSegmentByLeftEnd(const std::vector<Segment
 
     for (auto &s : segments)
     {
-        Event event = {s.p0()};//, Event::Type::LEFT_LOW};
+        Event event = {s.p0()};
         segmentsByPt[event].insert(s);
     }
 
@@ -63,7 +63,7 @@ Intersector::EventMap Intersector::getSegmentByRightEnd(const std::vector<Segmen
 
     for (auto &s : segments)
     {
-        Event event = {s.p1()};//, Event::Type::RIGHT_UP};
+        Event event = {s.p1()};
         segmentsByPt[event].insert(s);
     }
 
@@ -142,38 +142,6 @@ void Intersector::fillStatus(
         status.insert(s);
     for (auto &s : saveStatus)
         status.insert(s);
-}
-
-void Intersector::processRightPoints( Event const &event )
-{
-#if 0
-    auto
-            s_it_up = status.find(*eventSegments.find(event)->second.rbegin()),
-            s_it_low = status.find(*eventSegments.find(event)->second.begin());
-    if (s_it_up == status.end() || s_it_low == status.end())
-        return;
-
-    ++s_it_up;
-    --s_it_low;
-
-    // if both up and low neighbour exist
-    if (s_it_up != status.end() && s_it_low != status.end())
-    {
-        // add intersection event if intersection exists
-        bool has_intersect;
-        auto intPt = findIntersection(*s_it_up, *s_it_low, event, has_intersect);
-        if (has_intersect)
-        {
-            Event cross_event = {intPt};//, Event::Type::CROSS};
-            events.insert(cross_event);
-            if (crossSegMap.find(cross_event) == crossSegMap.end())
-                crossSegMap[cross_event] = SegmentSet(cross_event);
-            crossSegMap[cross_event].insert(*s_it_up);
-            crossSegMap[cross_event].insert(*s_it_low);
-            std::cout << "AAA";
-        }
-    }
-#endif
 }
 
 void Intersector::processLeftCrossPoints(
@@ -292,9 +260,7 @@ void Intersector::processEvent( Event const &event )
     calculateCurrentIntersections(leftSegments, rightSegments, crossSegments, event);
     fillStatus(leftSegments, crossSegments, rightSegments, event);
 
-    if (leftSegments.size() + crossSegments.size() == 0)
-        processRightPoints(event);
-    else
+    if (leftSegments.size() + crossSegments.size() != 0)
         processLeftCrossPoints(leftSegments, crossSegments, event);
 }
 
@@ -354,9 +320,29 @@ bool LessEvent::operator()(const Event &lhs, const Event &rhs)
 bool LessIntersection::operator()(const Intersection &lhs, const Intersection &rhs) const
 {
     // the only thing we need is to detect equal intersections
-    if ((lhs.id1 == rhs.id1 && lhs.id2 == rhs.id2) ||
-        (lhs.id1 == rhs.id2 && lhs.id2 == rhs.id1))
+    if (lhs.id1 == rhs.id2 && lhs.id2 == rhs.id1)
         return false;
     // Just to make sure that no intersections will be lost
     return Point(lhs.id1, lhs.id2) < Point(rhs.id1, rhs.id2);
+}
+
+void IntersectionSet::insert(const Intersection &inter)
+{
+    auto inter2 = inter;
+    inter2.id1 = inter.id2;
+    inter2.id2 = inter.id1;
+
+    if (intersection_set.find(inter) == intersection_set.end() &&
+        intersection_set.find(inter2) == intersection_set.end())
+        intersection_set.insert(inter);
+}
+
+void IntersectionSet::clear()
+{
+    intersection_set.clear();
+}
+
+std::set<Intersection, LessIntersection> const & IntersectionSet::get() const
+{
+    return intersection_set;
 }
