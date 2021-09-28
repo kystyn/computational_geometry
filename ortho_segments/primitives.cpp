@@ -169,6 +169,11 @@ std::istream &operator>>(std::istream &is, Segment &seg)
     return is;
 }
 
+Point::Point() {}
+
+Point::Point(float x, float y) : x(x), y(y)
+{}
+
 bool Point::operator==(const Point &rhs) const
 {
     return

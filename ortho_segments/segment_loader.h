@@ -4,7 +4,7 @@
 #include <vector>
 #include <string>
 
-struct Intersection;
+#include "intersector.h"
 
 class Segment;
 
@@ -25,7 +25,8 @@ public:
      * \param intersections[IN] intersection set.
      * \return True if successfully written, false otherwise.
      */
-    static bool saveToFile( std::string const &fileName, std::vector<Intersection> const &intersections );
+    static bool saveToFile( std::string const &fileName,
+                            Intersector::IntersectionSet const &intersections );
 };
 
 #endif // SEGMENT_LOADER_H

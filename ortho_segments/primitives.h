@@ -13,6 +13,18 @@ struct Point
     float x, y;
 
     /*!
+     * \brief Default class constructor.
+     */
+    Point();
+
+    /*!
+     * \brief Per component class constructor function.
+     * \param x x.
+     * \param y y.
+     */
+    Point( float x, float y );
+
+    /*!
      * \brief Comparator function.
      * \param rhs Point to compare with.
      * \return true if equal, false otherwise.

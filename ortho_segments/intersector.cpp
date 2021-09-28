@@ -1,9 +1,10 @@
 #include <cassert>
 #include <algorithm>
 #include <set>
+#include <iostream>
 #include "intersector.h"
 
-std::vector<Intersection>
+Intersector::IntersectionSet
     Intersector::computeIntersections( const std::vector<Segment> &segments )
 {
     leftSegMap.clear();
@@ -87,12 +88,12 @@ void Intersector::calculateCurrentIntersections(
             bool has_intersect;
             l_it->intersect(*l_it_j, has_intersect);
             if (has_intersect)
-                result.push_back({l_it->id(), l_it_j->id(), event});
+                result.insert({l_it->id(), l_it_j->id(), event});
         }
 
         // left x right
         for (auto &r : rightSegments)
-            result.push_back({l_it->id(), r.id(), event});
+            result.insert({l_it->id(), r.id(), event});
     }
 
     // right x right
@@ -106,7 +107,7 @@ void Intersector::calculateCurrentIntersections(
             bool has_intersect;
             r_it->intersect(*r_it_j, has_intersect);
             if (has_intersect)
-                result.push_back({r_it->id(), r_it_j->id(), event});
+                result.insert({r_it->id(), r_it_j->id(), event});
         }
     }
 
@@ -115,7 +116,7 @@ void Intersector::calculateCurrentIntersections(
         {
             auto j = i;
             for (++j; j != crossSegments.end(); j++)
-                result.push_back({i->id(), j->id(), event});
+                result.insert({i->id(), j->id(), event});
         }
 }
 
@@ -145,6 +146,7 @@ void Intersector::fillStatus(
 
 void Intersector::processRightPoints( Event const &event )
 {
+#if 0
     auto
             s_it_up = status.find(*eventSegments.find(event)->second.rbegin()),
             s_it_low = status.find(*eventSegments.find(event)->second.begin());
@@ -168,8 +170,10 @@ void Intersector::processRightPoints( Event const &event )
                 crossSegMap[cross_event] = SegmentSet(cross_event);
             crossSegMap[cross_event].insert(*s_it_up);
             crossSegMap[cross_event].insert(*s_it_low);
+            std::cout << "AAA";
         }
     }
+#endif
 }
 
 void Intersector::processLeftCrossPoints(
@@ -345,4 +349,14 @@ bool LessSegment::operator()(const Segment &lhs, const Segment &rhs)
 bool LessEvent::operator()(const Event &lhs, const Event &rhs)
 {
     return lhs < rhs;
+}
+
+bool LessIntersection::operator()(const Intersection &lhs, const Intersection &rhs) const
+{
+    // the only thing we need is to detect equal intersections
+    if ((lhs.id1 == rhs.id1 && lhs.id2 == rhs.id2) ||
+        (lhs.id1 == rhs.id2 && lhs.id2 == rhs.id1))
+        return false;
+    // Just to make sure that no intersections will be lost
+    return Point(lhs.id1, lhs.id2) < Point(rhs.id1, rhs.id2);
 }

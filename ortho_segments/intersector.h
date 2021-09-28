@@ -35,20 +35,27 @@ struct Intersection
     Point intPt;
 };
 
+class LessIntersection
+{
+public:
+    bool operator()( Intersection const &lhs,
+                     Intersection const &rhs ) const;
+};
+
 class Intersector
 {
 public:
     using SegmentSet = std::set<Segment, LessSegment>;
     using EventMap = std::map<Event, SegmentSet, LessEvent>;
     using EventSet = std::set<Event, LessEvent>;
+    using IntersectionSet = std::set<Intersection, LessIntersection>;
 
     /*!
      * \brief Compute intersections function.
      * \param segments Segment list.
      * \return Intersections list.
      */
-    std::vector<Intersection> computeIntersections( std::vector<Segment> const &segments );
-
+    IntersectionSet computeIntersections( std::vector<Segment> const &segments );
 private:
     /*!
      * \brief Find intersection right to sweep line function.
@@ -130,7 +137,7 @@ private:
     //! Sweep line status
     SegmentSet status;
     //! Set of intersections
-    std::vector<Intersection> result;
+    std::set<Intersection, LessIntersection> result;
 };
 
 #endif // INTERSECTOR_H
