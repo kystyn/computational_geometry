@@ -17,7 +17,9 @@ struct Point
      * \param rhs Point to compare with.
      * \return true if equal, false otherwise.
      */
-    bool operator==( Point const &rhs );
+    bool operator==( Point const &rhs ) const;
+
+    bool operator<( Point const &rhs ) const;
 };
 
 /*!
@@ -51,13 +53,6 @@ public:
      * \param id Segment identifier.
      */
     Segment( Point const &_p0, Point const &_p1, int id );
-
-    /*!
-     * \brief Assignment operator.
-     * \param seg Segment to assign.
-     * \return self-reference.
-     */
-    Segment & operator=( Segment const &seg );
 
     /*!
      * \brief Intersect segments function.

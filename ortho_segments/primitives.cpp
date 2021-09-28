@@ -1,3 +1,4 @@
+#include <cmath>
 #include "primitives.h"
 
 const float Segment::tolerance = 1e-5f;
@@ -27,16 +28,9 @@ Segment::Segment(const Point &p0, const Point &p1, int id) : _id(id)
     }
 
     orient =
-            p0.x - p1.x < tolerance ? Orientation::HORIZONTAL :
-            (p0.y - p1.y < tolerance ? Orientation::VERTICAL :
+            std::fabs(p0.x - p1.x) < tolerance ? Orientation::VERTICAL :
+            (std::fabs(p0.y - p1.y) < tolerance ? Orientation::HORIZONTAL :
                                        Orientation::NONE);
-}
-
-Segment & Segment::operator=(const Segment &seg)
-{
-    this->_p0 = seg._p0;
-    this->_p1 = seg._p1;
-    return *this;
 }
 
 Point Segment::intersect( Segment const &other, bool &has_intersect ) const
@@ -72,6 +66,12 @@ Point Segment::p1() const
 
 Point Segment::intersect_hor_hor( const Segment &other, bool &has_intersect ) const
 {
+    if (std::fabs(_p0.y - other._p0.y) > Segment::tolerance)
+    {
+        has_intersect = false;
+        return {};
+    }
+
     if (_p1.x >= other._p0.x)
     {
         // any point on common part of collinear edges
@@ -92,6 +92,11 @@ Point Segment::intersect_hor_hor( const Segment &other, bool &has_intersect ) co
 
 Point Segment::intersect_ver_ver(const Segment &other, bool &has_intersect) const
 {
+    if (std::fabs(_p0.x - other._p0.x) > Segment::tolerance)
+    {
+        has_intersect = false;
+        return {};
+    }
     if (_p1.y >= other._p0.y)
     {
         // any point on common part of collinear edges
@@ -164,9 +169,18 @@ std::istream &operator>>(std::istream &is, Segment &seg)
     return is;
 }
 
-bool Point::operator==(const Point &rhs)
+bool Point::operator==(const Point &rhs) const
 {
     return
             (rhs.x - x) * (rhs.x - x) +
             (rhs.y - y) * (rhs.y - y) < Segment::tolerance;
+}
+
+bool Point::operator<(const Point &rhs) const
+{
+    if (x + Segment::tolerance < rhs.x)
+        return true;
+    if (x > rhs.x + Segment::tolerance)
+        return false;
+    return y < rhs.y;
 }
