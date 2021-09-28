@@ -184,3 +184,8 @@ bool Point::operator<(const Point &rhs) const
         return false;
     return y < rhs.y;
 }
+
+bool Point::operator<=(const Point &rhs) const
+{
+    return *this < rhs || *this == rhs;
+}

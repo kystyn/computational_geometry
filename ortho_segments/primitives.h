@@ -19,7 +19,19 @@ struct Point
      */
     bool operator==( Point const &rhs ) const;
 
+    /*!
+     * \brief Strict order operator.
+     * \param rhs Point to compare with.
+     * \return True if less, false otherwise.
+     */
     bool operator<( Point const &rhs ) const;
+
+    /*!
+     * \brief Nonstrict order operator.
+     * \param rhs Point to compare with.
+     * \return True if less or equal, false otherwise.
+     */
+    bool operator<=( Point const &rhs ) const;
 };
 
 /*!

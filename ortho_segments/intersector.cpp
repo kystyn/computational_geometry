@@ -39,7 +39,7 @@ Point Intersector::findIntersection(
 {
     auto pt = lhs.intersect(rhs, has_intersect);
     if (has_intersect)
-        has_intersect = event < pt;
+        has_intersect = event <= pt;
     return pt;
 }
 
@@ -50,10 +50,7 @@ Intersector::EventMap Intersector::getSegmentByLeftEnd(const std::vector<Segment
     for (auto &s : segments)
     {
         Event event = {s.p0()};//, Event::Type::LEFT_LOW};
-        if (segmentsByPt.find(event) == segmentsByPt.end())
-        {
-            segmentsByPt[event].insert(s);
-        }
+        segmentsByPt[event].insert(s);
     }
 
     return segmentsByPt;
@@ -66,10 +63,7 @@ Intersector::EventMap Intersector::getSegmentByRightEnd(const std::vector<Segmen
     for (auto &s : segments)
     {
         Event event = {s.p1()};//, Event::Type::RIGHT_UP};
-        if (segmentsByPt.find(event) == segmentsByPt.end())
-        {
-            segmentsByPt[event].insert(s);
-        }
+        segmentsByPt[event].insert(s);
     }
 
     return segmentsByPt;
@@ -83,10 +77,38 @@ void Intersector::calculateCurrentIntersections(
 {
     // if there are at least 2 segments that have left and right end correspondingly,
     // then event is a point where they are crossed
-    if (!leftSegments.empty() && !rightSegments.empty())
-        for (auto &l : leftSegments)
-            for (auto &r : rightSegments)
-                result.push_back({l.id(), r.id(), event});
+    for (auto l_it = leftSegments.begin();
+         l_it != leftSegments.end(); ++l_it)
+    {
+        // maybe there are left x left intersections
+        auto l_it_j = l_it;
+        for (++l_it_j; l_it_j != leftSegments.end(); l_it_j++)
+        {
+            bool has_intersect;
+            l_it->intersect(*l_it_j, has_intersect);
+            if (has_intersect)
+                result.push_back({l_it->id(), l_it_j->id(), event});
+        }
+
+        // left x right
+        for (auto &r : rightSegments)
+            result.push_back({l_it->id(), r.id(), event});
+    }
+
+    // right x right
+    for (auto r_it = rightSegments.begin();
+         r_it != rightSegments.end(); ++r_it)
+    {
+        auto r_it_j = r_it;
+        for (++r_it_j;
+             r_it_j != rightSegments.end(); ++r_it_j)
+        {
+            bool has_intersect;
+            r_it->intersect(*r_it_j, has_intersect);
+            if (has_intersect)
+                result.push_back({r_it->id(), r_it_j->id(), event});
+        }
+    }
 
     if (crossSegments.size() >= 2)
         for (SegmentSet::iterator i = crossSegments.begin(); i != crossSegments.end(); ++i)
