@@ -11,6 +11,8 @@
 
 * Запуск большого теста:
   * ./ortho_segments -i ../segments_full.txt -o segments_out.txt
+  либо для вывода в стандартный поток
+  * ./ortho_segments -i ../segments_full.txt
 
 
 

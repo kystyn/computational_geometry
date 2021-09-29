@@ -5,11 +5,9 @@
 #include <cmath>
 #include "intersector.h"
 
-std::vector<Intersection> Intersector::computeIntersections(
-        const std::vector<Segment> &segments )
+void Intersector::computeIntersections( const std::vector<Segment> &segments, std::ostream *os )
 {
-    result.clear();
-
+    this->os = os;
     for (auto &s: segments)
     {
         events.push_back({s.p0(), s, Event::EndType::LEFT_LOW});
@@ -27,7 +25,6 @@ std::vector<Intersection> Intersector::computeIntersections(
     for (auto &event : events)
         processEvent(event);
 
-    return result;
 }
 
 Intersector::EventMap Intersector::getSegmentByLeftEnd(const std::vector<Segment> &segments) const
@@ -98,7 +95,7 @@ void Intersector::processEvent( Event const &event )
             bool has_intersect;
             auto intPt = event.segment.intersect(*it, has_intersect);
             assert(has_intersect);
-            result.push_back({event.segment.id(), it->id(), intPt});
+            *os << Intersection{event.segment.id(), it->id(), intPt};
         }
 
         // ... and find vertical segments that have common end point with current TODO
@@ -145,4 +142,10 @@ bool LessIntersection::operator()(const Intersection &lhs, const Intersection &r
         return false;
     // Just to make sure that no intersections will be lost
     return Point(lhs.id1, lhs.id2) < Point(rhs.id1, rhs.id2);
+}
+
+std::ostream &operator<<(std::ostream &os, const Intersection &inter)
+{
+    os << inter.id1 << ' ' << inter.id2 << ' ' << inter.intPt << '\n';
+    return os;
 }

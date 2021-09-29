@@ -39,20 +39,3 @@ std::vector<Segment> SegmentLoader::loadFromFile(const std::string &fileName, bo
     *ok = true;
     return segments;
 }
-
-bool SegmentLoader::saveToFile( const std::string &fileName,
-                                std::vector<Intersection> const &intersections )
-{
-    std::ofstream ofs(fileName);
-
-    if (!ofs)
-    {
-        std::clog << "file " << fileName << " not found\n";
-        return false;
-    }
-
-    for (auto &inter: intersections)
-        ofs << inter.id1 << ' ' << inter.id2 << ' ' << inter.intPt << '\n';
-
-    return true;
-}

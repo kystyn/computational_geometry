@@ -1,4 +1,5 @@
 #include <iostream>
+#include <fstream>
 #include <cstring>
 #include <string>
 
@@ -14,18 +15,28 @@ void help()
 
 int main( int argc, char *argv[] )
 {
-    if (argc != 5)
+    if (argc != 5 && argc != 3)
     {
         help();
         return 0;
     }
 
     std::string inputFileName, outputFileName;
+    std::ostream *os = &std::cout;
+    std::ofstream ofs;
     for (int i = 1; i < argc; i += 2)
         if (!strcmp(argv[i], "-i"))
             inputFileName = argv[i + 1];
         else if (!strcmp(argv[i], "-o"))
-            outputFileName = argv[i + 1];
+        {
+            ofs = std::ofstream(argv[i + 1]);
+
+            if (!ofs)
+            {
+                std::clog << "file " << argv[i + 1] << " not found\n";
+            }
+            os = &ofs;
+        }
         else
         {
             help();
@@ -44,12 +55,7 @@ int main( int argc, char *argv[] )
     }
 
     Intersector intersector;
-    auto result = intersector.computeIntersections(segments);
-
-    ok = loader.saveToFile(outputFileName, result);
-
-    if (!ok)
-        std::clog << "Something went wrong while saving to output file\n";
+    intersector.computeIntersections(segments, os);
 
     return 0;
 }

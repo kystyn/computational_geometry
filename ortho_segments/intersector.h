@@ -44,6 +44,8 @@ struct Intersection
     Point intPt;
 };
 
+std::ostream & operator<<( std::ostream &os, Intersection const& inter );
+
 class LessIntersection
 {
 public:
@@ -60,9 +62,9 @@ public:
     /*!
      * \brief Compute intersections function.
      * \param segments Segment list.
-     * \return Intersections list.
+     * \param os output stream.
      */
-    std::vector<Intersection> computeIntersections( std::vector<Segment> const &segments );
+    void computeIntersections( std::vector<Segment> const &segments, std::ostream *os );
 private:
     /*!
      * \brief Get segments list by their left point.
@@ -93,8 +95,8 @@ private:
     std::vector<Event> events;
     //! Sweep line status
     SegmentSet status;
-    //! Set of intersections
-    std::vector<Intersection> result;
+
+    std::ostream *os;
 };
 
 #endif // INTERSECTOR_H

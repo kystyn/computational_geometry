@@ -18,15 +18,6 @@ public:
      * \return List of segments.
      */
     static std::vector<Segment> loadFromFile( std::string const& fileName, bool *ok=nullptr );
-
-    /*!
-     * \brief Save intersections to file function.
-     * \param fileName[IN] File name to save to.
-     * \param intersections[IN] intersection set.
-     * \return True if successfully written, false otherwise.
-     */
-    static bool saveToFile( std::string const &fileName,
-                            std::vector<Intersection> const &intersections );
 };
 
 #endif // SEGMENT_LOADER_H
