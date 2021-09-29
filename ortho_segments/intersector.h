@@ -56,7 +56,6 @@ class Intersector
 public:
     using SegmentSet = std::set<Segment, LessSegment>;
     using EventMap = std::map<Event, SegmentSet, LessEvent>;
-    using EventSet = std::set<Event, LessEvent>;
 
     /*!
      * \brief Compute intersections function.
@@ -91,7 +90,7 @@ private:
      */
     void fillStatus( Event const &event );
 
-    EventSet events;
+    std::vector<Event> events;
     //! Sweep line status
     SegmentSet status;
     //! Set of intersections

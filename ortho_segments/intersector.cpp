@@ -12,18 +12,20 @@ std::vector<Intersection> Intersector::computeIntersections(
 
     for (auto &s: segments)
     {
-        events.insert({s.p0(), s, Event::EndType::LEFT_LOW});
+        events.push_back({s.p0(), s, Event::EndType::LEFT_LOW});
         // we need only one event corresponding to vertical segment
         if (s.orientation() == Segment::Orientation::HORIZONTAL)
-            events.insert({s.p1(), s, Event::EndType::RIGHT_UP});
+            events.push_back({s.p1(), s, Event::EndType::RIGHT_UP});
     }
 
-    while (!events.empty())
+    std::sort(events.begin(), events.end(),
+              []( Event const &lhs, Event const &rhs )
     {
-        Event event = *events.begin();
-        events.erase(event);
+        return LessEvent()(lhs, rhs);
+    });
+
+    for (auto &event : events)
         processEvent(event);
-    }
 
     return result;
 }
