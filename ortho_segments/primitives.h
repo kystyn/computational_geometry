@@ -110,6 +110,13 @@ public:
      */
     Point p1() const;
 
+    /*!
+     * \brief Comparator function.
+     * \param rhs Segment to compare with.
+     * \return true if equal, false otherwise.
+     */
+    bool operator==( Segment const &rhs ) const;
+
 private:
     /*!
      * \brief Intersect two horizontal segments function.

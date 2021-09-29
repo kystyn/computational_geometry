@@ -64,6 +64,11 @@ Point Segment::p1() const
     return _p1;
 }
 
+bool Segment::operator==(const Segment &rhs) const
+{
+    return _p0 == rhs._p0 && _p1 == rhs._p1;
+}
+
 Point Segment::intersect_hor_hor( const Segment &other, bool &has_intersect ) const
 {
     if (std::fabs(_p0.y - other._p0.y) > Segment::tolerance)
