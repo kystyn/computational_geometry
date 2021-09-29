@@ -51,32 +51,6 @@ public:
                      Intersection const &rhs ) const;
 };
 
-/*!
- * \brief Intersection set wrapper with unique insert.
- */
-class IntersectionSet
-{
-public:
-    /*!
-     * \brief Insert into set function.
-     * \param inter intersection to insert.
-     */
-    void insert( Intersection const &inter );
-
-    /*!
-     * \brief Clear function.
-     */
-    void clear();
-
-    /*!
-     * \brief Get set function.
-     * \return
-     */
-    std::set<Intersection, LessIntersection> const & get() const;
-private:
-    std::set<Intersection, LessIntersection> intersection_set;
-};
-
 class Intersector
 {
 public:
@@ -89,7 +63,7 @@ public:
      * \param segments Segment list.
      * \return Intersections list.
      */
-    IntersectionSet computeIntersections( std::vector<Segment> const &segments );
+    std::vector<Intersection> computeIntersections( std::vector<Segment> const &segments );
 private:
     /*!
      * \brief Get segments list by their left point.
@@ -121,7 +95,7 @@ private:
     //! Sweep line status
     SegmentSet status;
     //! Set of intersections
-    IntersectionSet result;
+    std::vector<Intersection> result;
 };
 
 #endif // INTERSECTOR_H

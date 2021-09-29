@@ -5,7 +5,7 @@
 #include <cmath>
 #include "intersector.h"
 
-IntersectionSet Intersector::computeIntersections(
+std::vector<Intersection> Intersector::computeIntersections(
         const std::vector<Segment> &segments )
 {
     result.clear();
@@ -96,7 +96,7 @@ void Intersector::processEvent( Event const &event )
             bool has_intersect;
             auto intPt = event.segment.intersect(*it, has_intersect);
             assert(has_intersect);
-            result.insert({event.segment.id(), it->id(), intPt});
+            result.push_back({event.segment.id(), it->id(), intPt});
         }
 
         // ... and find vertical segments that have common end point with current TODO
@@ -143,25 +143,4 @@ bool LessIntersection::operator()(const Intersection &lhs, const Intersection &r
         return false;
     // Just to make sure that no intersections will be lost
     return Point(lhs.id1, lhs.id2) < Point(rhs.id1, rhs.id2);
-}
-
-void IntersectionSet::insert(const Intersection &inter)
-{
-    auto inter2 = inter;
-    inter2.id1 = inter.id2;
-    inter2.id2 = inter.id1;
-
-    if (intersection_set.find(inter) == intersection_set.end() &&
-        intersection_set.find(inter2) == intersection_set.end())
-        intersection_set.insert(inter);
-}
-
-void IntersectionSet::clear()
-{
-    intersection_set.clear();
-}
-
-std::set<Intersection, LessIntersection> const & IntersectionSet::get() const
-{
-    return intersection_set;
 }

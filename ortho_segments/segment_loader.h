@@ -26,7 +26,7 @@ public:
      * \return True if successfully written, false otherwise.
      */
     static bool saveToFile( std::string const &fileName,
-                            IntersectionSet const &intersections );
+                            std::vector<Intersection> const &intersections );
 };
 
 #endif // SEGMENT_LOADER_H
