@@ -16,9 +16,10 @@ std::list<Vector> ConvexHullGraham::buildConvexHull()
     points.erase(p0_it);
 
     std::sort(points.begin(), points.end(),
-              []( Vector const& lhs, Vector const &rhs )
+              [&p0]( Vector const& lhs, Vector const &rhs )
     {
-        auto crossprod = lhs.crossProd(rhs);
+        auto v0 = lhs - p0, v1 = rhs - p0;
+        auto crossprod = v0.crossProd(v1);
         if (std::fabs(crossprod) > Vector::tolerance)
             return crossprod > Vector::tolerance;
         return lhs.len2() < rhs.len2();
@@ -28,7 +29,7 @@ std::list<Vector> ConvexHullGraham::buildConvexHull()
     hull.insert(hull.end(), p0);
     hull.insert(hull.end(), points[0]);
 
-    for (size_t i = 2; i < points.size(); i++)
+    for (size_t i = 1; i < points.size(); i++)
     {
         bool is_right_turn = true;
         while (is_right_turn)
@@ -45,7 +46,10 @@ std::list<Vector> ConvexHullGraham::buildConvexHull()
                     if (is_right_turn)
                         hull.remove(*top_it);
                 }
+                else break;
             }
+            else
+                break;
         }
         hull.insert(hull.end(), points[i]);
     }
@@ -57,7 +61,7 @@ bool ConvexHullGraham::isLeftTurn(const Vector &p1, const Vector &p2, const Vect
 {
     // vector p1p2
     Vector
-            p1p2 = p1 - p2,
+            p1p2 = p2 - p1,
             p2p3 = p3 - p2;
     return p1p2.crossProd(p2p3) >= -Vector::tolerance;
 }
