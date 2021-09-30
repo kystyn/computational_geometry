@@ -1,4 +1,5 @@
 #include <cmath>
+#include <tuple>
 #include "primitives.h"
 
 const float Vector::tolerance = 1e-5f;
@@ -9,7 +10,7 @@ std::istream &operator>>(std::istream &is, Vector &pt)
     float x, y;
     is >> id >> x >> y;
 
-    pt = Vector(id, x, y);
+    pt = Vector(x, y, id);
     return is;
 }
 
@@ -19,7 +20,7 @@ std::ostream & operator<<(std::ostream &os, Vector const &pt)
     return os;
 }
 
-Vector::Vector() {}
+Vector::Vector() : _x(0), _y(0) {}
 
 float Vector::x() const
 {
@@ -41,8 +42,16 @@ float Vector::len2() const
     return dotProd(*this);
 }
 
-Vector::Vector(int _id, float x, float y) : _id(_id), _x(x), _y(y)
+Vector::Vector(float x, float y, int _id) : _id(_id), _x(x), _y(y)
 {}
+
+Vector &Vector::operator+=(const Vector &rhs)
+{
+    _x += rhs._x;
+    _y += rhs._y;
+
+    return *this;
+}
 
 Vector & Vector::operator=(const Vector &rhs)
 {
@@ -54,7 +63,21 @@ Vector & Vector::operator=(const Vector &rhs)
 
 Vector Vector::operator-(const Vector &rhs) const
 {
-    return Vector(0, _x - rhs._x, _y - rhs._y);
+    return Vector(_x - rhs._x, _y - rhs._y);
+}
+
+Vector Vector::operator/(float num) const
+{
+    return Vector(_x / num, _y / num);
+}
+
+float Vector::distToLine(const std::tuple<float, float, float> &line) const
+{
+    auto
+            a = std::get<0>(line),
+            b = std::get<1>(line),
+            c = std::get<2>(line);
+    return std::abs(a * _x + b * _y + c) / std::sqrt(a * a + b * b);
 }
 
 float Vector::crossProd(const Vector &rhs) const

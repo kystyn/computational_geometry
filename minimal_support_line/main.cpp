@@ -5,6 +5,7 @@
 
 #include "point_loader.h"
 #include "convex_hull_graham.h"
+#include "minimal_support_line.h"
 
 using namespace std;
 
@@ -57,8 +58,10 @@ int main( int argc, char *argv[] )
     ConvexHullGraham ch(points);
     auto hull = ch.buildConvexHull();
 
-    for (auto &pt : hull)
-        std::cout << pt << ' ';
-    std::cout << '\n';
+    MinimalSupportLine msl;
+    auto optline = msl.findMinimalSupportLine(points, hull);
+
+    std::cout << "Optimal line containt points with id " <<
+                 optline.first << " and id " << optline.second << "\n";
     return 0;
 }

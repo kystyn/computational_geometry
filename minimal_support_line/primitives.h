@@ -40,15 +40,21 @@ public:
 
     /*!
      * \brief Per component class constructor function.
-     * \param _id _id.
      * \param x x.
      * \param y y.
+     * \param id id.
      */
-    Vector( int _id, float _x, float _y );
+    Vector( float _x, float _y, int _id = 0 );
+
+    Vector & operator+=( Vector const &rhs );
 
     Vector & operator=( Vector const &rhs );
 
     Vector operator-( Vector const &rhs ) const;
+
+    Vector operator/( float num ) const;
+
+    float distToLine( std::tuple<float, float, float> const &line ) const;
 
     /*!
      * \brief Evaluate cross product function.
