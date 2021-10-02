@@ -26,7 +26,7 @@ private:
      * \param p1 Second point in line.
      * \return a, b, c: ax + by + c = 0.
      */
-    std::tuple<float, float, float> getCanonicalLine( Vector const &p0, Vector const &p1 );
+    std::tuple<double, double, double> getCanonicalLine( Vector const &p0, Vector const &p1 );
 
     /*!
      * \brief Find mass center function.

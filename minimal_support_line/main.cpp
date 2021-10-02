@@ -61,7 +61,7 @@ int main( int argc, char *argv[] )
     MinimalSupportLine msl;
     auto optline = msl.findMinimalSupportLine(points, hull);
 
-    std::cout << "Optimal line containt points with id " <<
+    std::cout << "Optimal line contains points with id " <<
                  optline.first << " and id " << optline.second << "\n";
     return 0;
 }

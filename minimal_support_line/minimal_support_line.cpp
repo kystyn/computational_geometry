@@ -8,7 +8,7 @@ std::pair<int, int> MinimalSupportLine::findMinimalSupportLine(
     auto massCenter = findMassCenter(points);
 
     int opt_id1, opt_id2;
-    float opt_dist = std::numeric_limits<float>::max();
+    double opt_dist = std::numeric_limits<double>::max();
 
     for (auto it = conv_hull.begin(); it != conv_hull.end(); ++it)
     {
@@ -28,7 +28,7 @@ std::pair<int, int> MinimalSupportLine::findMinimalSupportLine(
     return {opt_id1, opt_id2};
 }
 
-std::tuple<float, float, float>
+std::tuple<double, double, double>
 MinimalSupportLine::getCanonicalLine( Vector const &p0, Vector const &p1 )
 {
     return std::make_tuple(

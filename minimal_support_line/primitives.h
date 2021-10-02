@@ -18,13 +18,13 @@ public:
      * \brief Get x coordinate function.
      * \return x coordinate.
      */
-    float x() const;
+    double x() const;
 
     /*!
      * \brief Get y coordinate function.
      * \return y coordinate.
      */
-    float y() const;
+    double y() const;
 
     /*!
      * \brief Get id function.
@@ -36,7 +36,7 @@ public:
      * \brief Evaluate square of Euclid norm function.
      * \return Square of Euclid norm.
      */
-    float len2() const;
+    double len2() const;
 
     /*!
      * \brief Per component class constructor function.
@@ -44,7 +44,7 @@ public:
      * \param y y.
      * \param id id.
      */
-    Vector( float _x, float _y, int _id = 0 );
+    Vector( double _x, double _y, int _id = 0 );
 
     Vector & operator+=( Vector const &rhs );
 
@@ -52,23 +52,23 @@ public:
 
     Vector operator-( Vector const &rhs ) const;
 
-    Vector operator/( float num ) const;
+    Vector operator/( double num ) const;
 
-    float distToLine( std::tuple<float, float, float> const &line ) const;
+    double distToLine( std::tuple<double, double, double> const &line ) const;
 
     /*!
      * \brief Evaluate cross product function.
      * \param rhs Vector to evaluate cross product to.
      * \return Cross product.
      */
-    float crossProd( Vector const &rhs ) const;
+    double crossProd( Vector const &rhs ) const;
 
     /*!
      * \brief Dot product function.
      * \param rhs Vector to evaluate dot product to.
      * \return Dot product.
      */
-    float dotProd( Vector const &rhs ) const;
+    double dotProd( Vector const &rhs ) const;
 
     /*!
      * \brief Comparator function.
@@ -91,11 +91,11 @@ public:
      */
     bool operator<=( Vector const &rhs ) const;
 
-    static const float tolerance;
+    static const double tolerance;
 
 private:
     int _id;
-    float _x, _y;
+    double _x, _y;
 };
 
 
