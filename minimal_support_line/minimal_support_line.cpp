@@ -15,6 +15,7 @@ std::pair<int, int> MinimalSupportLine::findMinimalSupportLine(
         auto it1 = it;
         auto it2 = it;
         ++it2;
+        it = it2 != conv_hull.end() ? it2 : conv_hull.begin();
         auto line = getCanonicalLine(*it1, it2 != conv_hull.end() ? *it2 : *conv_hull.begin());
         auto dist = massCenter.distToLine(line);
 
