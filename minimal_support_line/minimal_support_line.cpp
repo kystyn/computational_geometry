@@ -10,13 +10,14 @@ std::pair<int, int> MinimalSupportLine::findMinimalSupportLine(
     int opt_id1, opt_id2;
     double opt_dist = std::numeric_limits<double>::max();
 
-    for (auto it = conv_hull.begin(); it != conv_hull.end(); ++it)
+    int i = 0;
+    for (auto it = conv_hull.begin(); it != conv_hull.end(); ++it, i++)
     {
         auto it1 = it;
         auto it2 = it;
         ++it2;
-        it = it2 != conv_hull.end() ? it2 : conv_hull.begin();
-        auto line = getCanonicalLine(*it1, it2 != conv_hull.end() ? *it2 : *conv_hull.begin());
+        it2 = it2 != conv_hull.end() ? it2 : conv_hull.begin();
+        auto line = getCanonicalLine(*it1, *it2);
         auto dist = massCenter.distToLine(line);
 
         if (dist < opt_dist)
